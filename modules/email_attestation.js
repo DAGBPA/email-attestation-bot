@@ -1,8 +1,8 @@
 /*jslint node: true */
 'use strict';
-const conf = require('byteballcore/conf');
-const objectHash = require('byteballcore/object_hash.js');
-const db = require('byteballcore/db');
+const conf = require('dag-pizza-dough/conf');
+const objectHash = require('dag-pizza-dough/object_hash.js');
+const db = require('dag-pizza-dough/db');
 const notifications = require('./notifications');
 const texts = require('./texts');
 
@@ -33,7 +33,7 @@ function retryPostingAttestations() {
 
 function postAndWriteAttestation(transaction_id, attestor_address, attestation_payload, src_profile, callback) {
 	if (!callback) callback = function () {};
-	const mutex = require('byteballcore/mutex.js');
+	const mutex = require('dag-pizza-dough/mutex.js');
 	mutex.lock(['tx-'+transaction_id], (unlock) => {
 		db.query(
 			`SELECT device_address, attestation_date
@@ -61,7 +61,7 @@ function postAndWriteAttestation(transaction_id, attestor_address, attestation_p
 						WHERE transaction_id=?`,
 						[unit, transaction_id],
 						() => {
-							let device = require('byteballcore/device.js');
+							let device = require('dag-pizza-dough/device.js');
 							let text = "Now your email is attested, see the attestation unit: https://explorer.byteball.org/#"+unit;
 
 							if (src_profile) {
@@ -90,7 +90,7 @@ function postAndWriteAttestation(transaction_id, attestor_address, attestation_p
 function postAttestation(attestor_address, payload, onDone) {
 	function onError(err) {
 		console.error("attestation failed: " + err);
-		let balances = require('byteballcore/balances');
+		let balances = require('dag-pizza-dough/balances');
 		balances.readBalance(attestor_address, (balance) => {
 			console.error('balance', balance);
 			notifications.notifyAdmin('attestation failed', err + ", balance: " + JSON.stringify(balance));
@@ -98,8 +98,8 @@ function postAttestation(attestor_address, payload, onDone) {
 		onDone(err);
 	}
 
-	let network = require('byteballcore/network.js');
-	let composer = require('byteballcore/composer.js');
+	let network = require('dag-pizza-dough/network.js');
+	let composer = require('dag-pizza-dough/composer.js');
 	let headlessWallet = require('headless-byteball');
 	let objMessage = {
 		app: "attestation",
@@ -164,7 +164,7 @@ function getAttestationPayloadAndSrcProfile(user_address, email, bPublic) {
 }
 
 function hideProfile(profile) {
-	let composer = require('byteballcore/composer.js');
+	let composer = require('dag-pizza-dough/composer.js');
 	let hidden_profile = {};
 	let src_profile = {};
 

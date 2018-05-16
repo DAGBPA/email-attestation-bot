@@ -1,7 +1,7 @@
 /*jslint node: true */
 'use strict';
-const conf = require('byteballcore/conf.js');
-const mail = require('byteballcore/mail.js');
+const conf = require('dag-pizza-dough/conf.js');
+const mail = require('dag-pizza-dough/mail.js');
 const emailjs = require('emailjs');
 
 let server;

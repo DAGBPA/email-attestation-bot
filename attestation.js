@@ -1,11 +1,11 @@
 /*jslint node: true */
 'use strict';
-const constants = require('byteballcore/constants.js');
-const conf = require('byteballcore/conf');
-const db = require('byteballcore/db');
-const eventBus = require('byteballcore/event_bus');
-const validationUtils = require('byteballcore/validation_utils');
-const mail = require('byteballcore/mail');
+const constants = require('dag-pizza-dough/constants.js');
+const conf = require('dag-pizza-dough/conf');
+const db = require('dag-pizza-dough/db');
+const eventBus = require('dag-pizza-dough/event_bus');
+const validationUtils = require('dag-pizza-dough/validation_utils');
+const mail = require('dag-pizza-dough/mail');
 const texts = require('./modules/texts');
 const reward = require('./modules/reward');
 const conversion = require('./modules/conversion');
@@ -104,7 +104,7 @@ function handleWalletReady() {
 }
 
 function moveFundsToAttestorAddresses() {
-	let network = require('byteballcore/network.js');
+	let network = require('dag-pizza-dough/network.js');
 	if (network.isCatchingUp())
 		return;
 
@@ -134,7 +134,7 @@ function moveFundsToAttestorAddresses() {
 			}, (err, unit) => {
 				if (err) {
 					console.error("failed to move funds: " + err);
-					let balances = require('byteballcore/balances');
+					let balances = require('dag-pizza-dough/balances');
 					balances.readBalance(arrAddresses[0], (balance) => {
 						console.error('balance', balance);
 						notifications.notifyAdmin('failed to move funds', err + ", balance: " + JSON.stringify(balance));
@@ -165,7 +165,7 @@ function retrySendingEmails() {
 }
 
 function handleNewTransactions(arrUnits) {
-	let device = require('byteballcore/device.js');
+	let device = require('dag-pizza-dough/device.js');
 	db.query(
 		`SELECT
 			amount, asset, unit,
@@ -219,9 +219,9 @@ function checkPayment(row, onDone) {
 		return onDone("Received payment in wrong asset");
 	}
 
-	if (row.amount < conf.priceInBytes) {
-		let text = `Received ${row.amount} Bytes from you, which is less than the expected ${conf.priceInBytes} Bytes.`;
-		return onDone(text + '\n\n' + texts.pleasePay(row.receiving_address, conf.priceInBytes));
+	if (row.amount < conf.priceInPizza) {
+		let text = `Received ${row.amount} Pizza from you, which is less than the expected ${conf.priceInPizza} Pizza.`;
+		return onDone(text + '\n\n' + texts.pleasePay(row.receiving_address, conf.priceInPizza));
 	}
 
 	function resetUserAddress(){
@@ -242,7 +242,7 @@ function checkPayment(row, onDone) {
 }
 
 function handleTransactionsBecameStable(arrUnits) {
-	let device = require('byteballcore/device.js');
+	let device = require('dag-pizza-dough/device.js');
 	db.query(
 		`SELECT 
 			transaction_id, 
@@ -284,7 +284,7 @@ function handleTransactionsBecameStable(arrUnits) {
 }
 
 function sendVerificationCodeToEmailAndMarkIsSent(user_email, code, transaction_id, device_address) {
-	let device = require('byteballcore/device.js');
+	let device = require('dag-pizza-dough/device.js');
 	mail.sendmail({
 		from: `${conf.attestation_from_name ? conf.attestation_from_name + ' ' : ''}<${conf.attestation_from_email}>`,
 		to: user_email,
@@ -316,8 +316,8 @@ function sendVerificationCodeToEmailAndMarkIsSent(user_email, code, transaction_
  * @param response
  */
 function respond (from_address, text, response = '') {
-	let device = require('byteballcore/device.js');
-	const mutex = require('byteballcore/mutex.js');
+	let device = require('dag-pizza-dough/device.js');
+	const mutex = require('dag-pizza-dough/mutex.js');
 	readUserInfo(from_address, (userInfo) => {
 
 		function checkUserAddress(onDone) {
@@ -363,7 +363,7 @@ function respond (from_address, text, response = '') {
 				}
 
 				readOrAssignReceivingAddress(from_address, userInfo, (receiving_address, post_publicly) => {
-					let price = conf.priceInBytes;
+					let price = conf.priceInPizza;
 
 					if (text === 'private' || text === 'public') {
 						post_publicly = (text === 'public') ? 1 : 0;
@@ -518,23 +518,23 @@ function respond (from_address, text, response = '') {
 																	);
 
 																	if (checkIsEmailQualifiedForReward(row.user_email) && conf.rewardInUSD) {
-																		let rewardInBytes = conversion.getPriceInBytes(conf.rewardInUSD);
+																		let rewardInPizza = conversion.getPriceInPizza(conf.rewardInUSD);
 																		db.query(
 																			`INSERT ${db.getIgnore()} INTO reward_units
 																			(transaction_id, user_address, user_email, user_id, reward)
 																			VALUES (?,?,?,?,?)`,
-																			[transaction_id, userInfo.user_address, row.user_email, attestation.profile.user_id, rewardInBytes],
+																			[transaction_id, userInfo.user_address, row.user_email, attestation.profile.user_id, rewardInPizza],
 																			(res) => {
 																				console.error(`reward_units insertId: ${res.insertId}, affectedRows: ${res.affectedRows}`);
 																				if (!res.affectedRows) {
 																					return console.log(`duplicate user_address or user_id: ${userInfo.user_address}, ${attestation.profile.user_id}`);
 																				}
 
-																				device.sendMessageToDevice(from_address, 'text', texts.attestedSuccessFirstTimeBonus(rewardInBytes));
+																				device.sendMessageToDevice(from_address, 'text', texts.attestedSuccessFirstTimeBonus(rewardInPizza));
 																				reward.sendAndWriteReward('attestation', transaction_id);
 
 																				if (conf.referralRewardInUSD) {
-																					let referralRewardInBytes = conversion.getPriceInBytes(conf.referralRewardInUSD);
+																					let referralRewardInPizza = conversion.getPriceInPizza(conf.referralRewardInUSD);
 																					reward.findReferrer(row.payment_unit, userInfo.user_address, (referring_user_id, referring_user_address, referring_user_device_address) => {
 																						if (!referring_user_address) {
 																							// console.error("no referring user for " + row.user_address);
@@ -548,7 +548,7 @@ function respond (from_address, text, response = '') {
 																							[transaction_id,
 																								referring_user_address, referring_user_id,
 																								userInfo.user_address, attestation.profile.user_id,
-																								referralRewardInBytes],
+																								referralRewardInPizza],
 																							(res) => {
 																								console.log(`referral_reward_units insertId: ${res.insertId}, affectedRows: ${res.affectedRows}`);
 																								if (!res.affectedRows) {
@@ -558,7 +558,7 @@ function respond (from_address, text, response = '') {
 																									);
 																								}
 
-																								device.sendMessageToDevice(referring_user_device_address, 'text', texts.referredUserBonus(referralRewardInBytes));
+																								device.sendMessageToDevice(referring_user_device_address, 'text', texts.referredUserBonus(referralRewardInPizza));
 																								reward.sendAndWriteReward('referral', transaction_id);
 																							}
 																						);
@@ -567,7 +567,7 @@ function respond (from_address, text, response = '') {
 
 																			}
 																		);
-																	} // if conf.rewardInBytes
+																	} // if conf.rewardInPizza
 
 																}
 															);
@@ -716,7 +716,7 @@ function readUserInfo (device_address, callback) {
  * @param callback
  */
 function readOrAssignReceivingAddress(device_address, userInfo, callback) {
-	const mutex = require('byteballcore/mutex.js');
+	const mutex = require('dag-pizza-dough/mutex.js');
 	mutex.lock([device_address], (unlock) => {
 		db.query(
 			`SELECT receiving_address, post_publicly, ${db.getUnixTimestamp('last_price_date')} AS price_ts
@@ -736,7 +736,7 @@ function readOrAssignReceivingAddress(device_address, userInfo, callback) {
 						`INSERT INTO receiving_addresses 
 						(device_address, user_address, user_email, receiving_address, price, last_price_date) 
 						VALUES(?,?,?,?,?,${db.getNow()})`,
-						[device_address, userInfo.user_address, userInfo.user_email, receiving_address, conf.priceInBytes],
+						[device_address, userInfo.user_address, userInfo.user_email, receiving_address, conf.priceInPizza],
 						() => {
 							callback(receiving_address, null);
 							unlock();

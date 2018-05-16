@@ -1,7 +1,7 @@
 /*jslint node: true */
 'use strict';
-const desktopApp = require('byteballcore/desktop_app.js');
-const conf = require('byteballcore/conf');
+const desktopApp = require('dag-pizza-dough/desktop_app.js');
+const conf = require('dag-pizza-dough/conf');
 
 const arrWhitelistEmails = Object.keys(conf.objRewardWhiteListEmails);
 
@@ -18,24 +18,24 @@ exports.greeting = () => {
 	//	"Some apps may request you to reveal your privately attested email to them in order to be able to access the apps.",
 		"\n\n",
 
-		`The price of attestation is ${conf.priceInBytes/1e9} GB. `,
+		`The price of attestation is ${conf.priceInPizza/1e9} GP. `,
 		"The payment is nonrefundable even if the attestation fails for any reason.\n\n",
 
 		"After payment, you will be able to prove your email by receiving a verification code and entering it here.\n\n",
 
 		`After you successfully verify your email address for the first time, `,
 		`and if your email is on one of the following domains:\n${arrWhitelistEmails.join(',\n')},\n`,
-		`you receive a $${conf.rewardInUSD.toLocaleString([], {minimumFractionDigits: 2})} reward in Bytes.`
+		`you receive a $${conf.rewardInUSD.toLocaleString([], {minimumFractionDigits: 2})} reward in Pizza.`
 	].join('');
 };
 
 exports.weHaveReferralProgram = () => {
 	return [
 		"Remember, we have a referral program: " +
-		"if you send Bytes from your attested address to a new user who is not attested yet, " +
-		"and he/she uses those Bytes to pay for a successful attestation, " +
+		"if you send Pizza from your attested address to a new user who is not attested yet, " +
+		"and he/she uses those Pizza to pay for a successful attestation, " +
 		`and his/her email is on one of the following domains:\n${arrWhitelistEmails.join(',\n')},\n` +
-		`you receive a $${conf.referralRewardInUSD.toLocaleString([], {minimumFractionDigits: 2})} reward in Bytes.\n\nIf you would like to attest another email address, just type it here.`
+		`you receive a $${conf.referralRewardInUSD.toLocaleString([], {minimumFractionDigits: 2})} reward in Pizza.\n\nIf you would like to attest another email address, just type it here.`
 	].join('');
 };
 
@@ -120,20 +120,20 @@ exports.emailWasSent = (emailAddress) => {
 	].join('');
 };
 
-exports.attestedSuccessFirstTimeBonus = (rewardInBytes) => {
+exports.attestedSuccessFirstTimeBonus = (rewardInPizza) => {
 	return [
 		"You attested your email for the first time and will receive a welcome bonus ",
 		`of $${conf.rewardInUSD.toLocaleString([], {minimumFractionDigits: 2})} `,
-		`(${(rewardInBytes/1e9).toLocaleString([], {maximumFractionDigits: 9})} GB) `,
+		`(${(rewardInPizza/1e9).toLocaleString([], {maximumFractionDigits: 9})} GB) `,
 		"from Byteball distribution fund."
 	].join('')
 };
 
-exports.referredUserBonus = (referralRewardInBytes) => {
+exports.referredUserBonus = (referralRewardInPizza) => {
 	return [
 		"You referred a user who has just verified his email address and you will receive a reward ",
 		`of $${conf.referralRewardInUSD.toLocaleString([], {minimumFractionDigits: 2})} `,
-		`(${(referralRewardInBytes/1e9).toLocaleString([], {maximumFractionDigits: 9})} GB) `,
+		`(${(referralRewardInPizza/1e9).toLocaleString([], {maximumFractionDigits: 9})} GB) `,
 		"from Byteball distribution fund.\n",
 		"Thank you for bringing in a new byteballer, the value of the ecosystem grows with each new user!"
 	].join('');

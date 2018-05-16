@@ -1,17 +1,17 @@
 {
-  "name": "email-attestation",
+  "name": "email-attestation-bot",
   "version": "1.0.0",
-  "description": "A byteball bot for attestation of email address",
+  "description": "A bot for attestation of email address",
   "main": "attestation.js",
-  "repository": "https://github.com/byteball/email-attestation.git",
-  "author": "temikn <temikng@gmail.com>",
+  "repository": "https://github.com/DAGBPA/email-attestation-bot.git",
+  "author": "DAGBPA",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",
-    "byteball-witness": "git+https://github.com/byteball/byteball-witness.git",
-    "byteballcore": "git+https://github.com/byteball/byteballcore.git",
+    "dag-pizza-chef": "git+https://github.com/DAGBPA/dag-pizza-chef.git",
+    "dag-pizza-dough": "git+https://github.com/DAGBPA/dag-pizza-dough.git",
     "emailjs": "^2.0.0",
-    "headless-byteball": "git+https://github.com/byteball/headless-byteball.git",
+    "dag-pizza-headless": "git+https://github.com/DAGBPA/dag-pizza-headless.git",
     "request": "2.83.0"
   }
 }

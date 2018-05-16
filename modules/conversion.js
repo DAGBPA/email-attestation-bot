@@ -1,7 +1,7 @@
 /*jslint node: true */
 'use strict';
 const request = require('request');
-const eventBus = require('byteballcore/event_bus.js');
+const eventBus = require('dag-pizza-dough/event_bus.js');
 const notifications = require('./notifications');
 
 let GBYTE_BTC_rate;
@@ -15,7 +15,7 @@ function checkAllRatesUpdated() {
 	if (GBYTE_BTC_rate && BTC_USD_rate) {
 		bRatesReady = true;
 		console.log('rates are ready');
-		console.log(`1$ = ${getPriceInBytes(1)} Bytes at ${new Date()}`);
+		console.log(`1$ = ${getPriceInPizza(1)} Pizza at ${new Date()}`);
 		const headlessWallet = require('headless-byteball'); // start loading headless only when rates are ready
 		checkRatesAndHeadless();
 	}
@@ -58,7 +58,7 @@ function updateBittrexRates() {
 	});
 }
 
-function getPriceInBytes(priceInUSD) {
+function getPriceInPizza(priceInUSD) {
 	if (!bRatesReady) {
 		throw Error("rates not ready yet");
 	}
@@ -72,5 +72,5 @@ function enableRateUpdates() {
 updateBittrexRates();
 enableRateUpdates();
 
-exports.getPriceInBytes = getPriceInBytes;
+exports.getPriceInPizza = getPriceInPizza;
 
